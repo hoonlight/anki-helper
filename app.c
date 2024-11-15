@@ -27,11 +27,16 @@ void download_file(HWND hwnd) {
         curl_easy_setopt(curl, CURLOPT_URL, URL);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L); // 리디렉션 따라가기
+
+        // Ignore SSL certificate verification
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+
         res = curl_easy_perform(curl);
         fclose(fp);
 
         if (res != CURLE_OK) {
-            _wremove(outfilename); // Remove the file if download failed
             MessageBoxW(hwnd, L"다운로드 실패!", L"오류", MB_OK | MB_ICONERROR);
         } else {
             MessageBoxW(hwnd, L"다운로드 완료!", L"정보", MB_OK);
@@ -63,7 +68,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             int buttonX = (rect.right - buttonWidth) / 2;
             int buttonY = (rect.bottom - buttonHeight) / 2 + 10;
 
-            CreateWindowW(L"STATIC", L"최신 Deck: 2024-11-15-A", WS_VISIBLE | WS_CHILD | SS_CENTER,
+            CreateWindowW(L"STATIC", L"Last update: 2024-11-15", WS_VISIBLE | WS_CHILD | SS_CENTER,
                           0, buttonY - 50, rect.right, 20, hwnd, (HMENU)2,
                           (HINSTANCE)GetWindowLongPtr(hwnd, GWLP_HINSTANCE), NULL);
 
